@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,10 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Product, SalesReport } from "@/types";
-import { BarChart, LineChart } from "@/components/ui/chart";
 import { PlusCircle, Edit, Trash2, Search, ArrowUpDown, Download, AlertCircle } from "lucide-react";
 import { mockProducts, mockUsers, mockSalesReports } from "./admin-mock-data";
 import { toast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  BarChart, LineChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from "recharts";
 import {
   Dialog,
   DialogContent,
@@ -223,9 +227,16 @@ const AdminPanel = () => {
                 <CardDescription>Daily revenue for the last 7 days</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={{}} className="h-[300px]">
-                  <SimpleLineChart data={salesData} className="h-[300px]" />
-                </ChartContainer>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={salesData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="total" stroke="#0ea5e9" />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
             <Card>
@@ -234,9 +245,16 @@ const AdminPanel = () => {
                 <CardDescription>Daily units sold for the last 7 days</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={{}} className="h-[300px]">
-                  <SimpleBarChart data={productData} className="h-[300px]" />
-                </ChartContainer>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={productData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="products" fill="#10b981" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
@@ -456,9 +474,16 @@ const AdminPanel = () => {
           
           <Card>
             <CardContent>
-              <ChartContainer config={{}} className="h-[300px]">
-                <SimpleLineChart data={salesData} className="h-[300px]" />
-              </ChartContainer>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={salesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="total" stroke="#0ea5e9" />
+                </LineChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
           
