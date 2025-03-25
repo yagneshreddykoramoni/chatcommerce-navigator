@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -37,8 +38,9 @@ const AdminPanel = () => {
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsEnabled(e.target.checked);
+  // Modified handler to accept boolean directly from the Switch component
+  const handleSwitchChange = (checked: boolean) => {
+    setIsEnabled(checked);
   };
 
   const handleAddProduct = () => {
@@ -171,7 +173,7 @@ const AdminPanel = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-2">
-            <Switch id="enable" checked={isEnabled} onCheckedChange={handleCheckboxChange} />
+            <Switch id="enable" checked={isEnabled} onCheckedChange={handleSwitchChange} />
             <Label htmlFor="enable">Enable Store</Label>
           </div>
         </CardContent>
