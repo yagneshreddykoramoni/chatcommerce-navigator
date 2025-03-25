@@ -20,32 +20,26 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => (
-  <>
-    <Toaster />
-    <Sonner />
-    <AuthDialog />
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/signin" element={<SignIn />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/products/:productId" element={<ProductDetails />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/favorites" element={<Favorites />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  </>
-);
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
         <AuthProvider>
           <AppStateProvider>
-            <AppContent />
+            <Toaster />
+            <Sonner />
+            <AuthDialog />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:productId" element={<ProductDetails />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/favorites" element={<Favorites />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </AppStateProvider>
         </AuthProvider>
       </BrowserRouter>
