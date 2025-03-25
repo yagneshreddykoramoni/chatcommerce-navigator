@@ -8,90 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Product, SalesReport } from "@/types";
-import { BarChart, LineChart } from "@/components/ui/chart";
 import { PlusCircle, Edit, Trash2, Search, ArrowUpDown, Download } from "lucide-react";
 import { mockProducts, mockUsers, mockSalesReports } from "./admin-mock-data";
 import { toast } from "@/hooks/use-toast";
-
-// Let's define the mock data here since we don't have a separate file for it
-const mockUsers = [
-  { id: "1", name: "John Doe", email: "john@example.com", isAdmin: false, orders: 5, lastActive: "2023-07-15" },
-  { id: "2", name: "Jane Smith", email: "jane@example.com", isAdmin: false, orders: 12, lastActive: "2023-07-20" },
-  { id: "3", name: "Admin User", email: "admin@example.com", isAdmin: true, orders: 0, lastActive: "2023-07-22" },
-];
-
-const mockSalesReports: SalesReport[] = [
-  {
-    date: "2023-07-16",
-    totalSales: 1250.75,
-    productsSold: 18,
-    topSellingProducts: [
-      { productId: "1", productName: "Casual Shirt", quantity: 5 },
-      { productId: "2", productName: "Formal Blazer", quantity: 3 },
-      { productId: "3", productName: "Sneakers", quantity: 4 }
-    ]
-  },
-  {
-    date: "2023-07-17",
-    totalSales: 980.50,
-    productsSold: 15,
-    topSellingProducts: [
-      { productId: "3", productName: "Sneakers", quantity: 6 },
-      { productId: "1", productName: "Casual Shirt", quantity: 4 },
-      { productId: "2", productName: "Formal Blazer", quantity: 2 }
-    ]
-  },
-  {
-    date: "2023-07-18",
-    totalSales: 1350.25,
-    productsSold: 22,
-    topSellingProducts: [
-      { productId: "1", productName: "Casual Shirt", quantity: 8 },
-      { productId: "3", productName: "Sneakers", quantity: 7 },
-      { productId: "2", productName: "Formal Blazer", quantity: 4 }
-    ]
-  },
-  {
-    date: "2023-07-19",
-    totalSales: 875.60,
-    productsSold: 14,
-    topSellingProducts: [
-      { productId: "3", productName: "Sneakers", quantity: 5 },
-      { productId: "2", productName: "Formal Blazer", quantity: 4 },
-      { productId: "1", productName: "Casual Shirt", quantity: 3 }
-    ]
-  },
-  {
-    date: "2023-07-20",
-    totalSales: 1420.30,
-    productsSold: 24,
-    topSellingProducts: [
-      { productId: "1", productName: "Casual Shirt", quantity: 9 },
-      { productId: "3", productName: "Sneakers", quantity: 8 },
-      { productId: "2", productName: "Formal Blazer", quantity: 5 }
-    ]
-  },
-  {
-    date: "2023-07-21",
-    totalSales: 1050.75,
-    productsSold: 17,
-    topSellingProducts: [
-      { productId: "3", productName: "Sneakers", quantity: 7 },
-      { productId: "1", productName: "Casual Shirt", quantity: 6 },
-      { productId: "2", productName: "Formal Blazer", quantity: 3 }
-    ]
-  },
-  {
-    date: "2023-07-22",
-    totalSales: 1680.90,
-    productsSold: 28,
-    topSellingProducts: [
-      { productId: "1", productName: "Casual Shirt", quantity: 11 },
-      { productId: "3", productName: "Sneakers", quantity: 10 },
-      { productId: "2", productName: "Formal Blazer", quantity: 6 }
-    ]
-  }
-];
+import { ChartContainer, ChartTooltipContent, ChartTooltip } from "@/components/ui/chart";
+import { BarChart, LineChart, ResponsiveContainer } from "recharts";
 
 const AdminPanel = () => {
   const [products] = useState<Product[]>(mockProducts);
@@ -149,6 +70,23 @@ const AdminPanel = () => {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Create simple chart components using recharts
+  const SimpleLineChart = ({ data, className }: { data: any[]; className?: string }) => (
+    <ResponsiveContainer width="100%" height={300} className={className}>
+      <LineChart data={data}>
+        {/* Add chart elements as needed */}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+
+  const SimpleBarChart = ({ data, className }: { data: any[]; className?: string }) => (
+    <ResponsiveContainer width="100%" height={300} className={className}>
+      <BarChart data={data}>
+        {/* Add chart elements as needed */}
+      </BarChart>
+    </ResponsiveContainer>
+  );
+
   return (
     <div className="w-full p-4 space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -202,14 +140,9 @@ const AdminPanel = () => {
                 <CardDescription>Daily revenue for the last 7 days</CardDescription>
               </CardHeader>
               <CardContent>
-                <LineChart
-                  data={salesData}
-                  categories={["total"]}
-                  index="name"
-                  colors={["#0ea5e9"]}
-                  valueFormatter={(value) => `$${value.toFixed(2)}`}
-                  className="h-[300px]"
-                />
+                <ChartContainer config={{}} className="h-[300px]">
+                  <SimpleLineChart data={salesData} className="h-[300px]" />
+                </ChartContainer>
               </CardContent>
             </Card>
             <Card>
@@ -218,14 +151,9 @@ const AdminPanel = () => {
                 <CardDescription>Daily units sold for the last 7 days</CardDescription>
               </CardHeader>
               <CardContent>
-                <BarChart
-                  data={productData}
-                  categories={["products"]}
-                  index="name"
-                  colors={["#10b981"]}
-                  valueFormatter={(value) => `${value} units`}
-                  className="h-[300px]"
-                />
+                <ChartContainer config={{}} className="h-[300px]">
+                  <SimpleBarChart data={productData} className="h-[300px]" />
+                </ChartContainer>
               </CardContent>
             </Card>
           </div>
@@ -447,14 +375,9 @@ const AdminPanel = () => {
           
           <Card>
             <CardContent>
-              <LineChart
-                data={salesData}
-                categories={["total"]}
-                index="name"
-                colors={["#0ea5e9"]}
-                valueFormatter={(value) => `$${value.toFixed(2)}`}
-                className="h-[300px]"
-              />
+              <ChartContainer config={{}} className="h-[300px]">
+                <SimpleLineChart data={salesData} className="h-[300px]" />
+              </ChartContainer>
             </CardContent>
           </Card>
           
