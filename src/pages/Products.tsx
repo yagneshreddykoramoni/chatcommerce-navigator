@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,103 +12,55 @@ import { Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import ChatBot from "@/components/ChatBot";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useAppState } from "@/hooks/useAppState";
 
-// Mock products data
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "Casual Shirt",
-    description: "Comfortable cotton shirt for casual occasions",
-    price: 29.99,
-    imageUrl: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2hpcnR8ZW58MHx8MHx8fDA%3D",
-    category: "Clothing",
-    tags: ["shirt", "casual", "cotton"],
-    inStock: true
-  },
-  {
-    id: "2",
-    name: "Formal Blazer",
-    description: "Elegant blazer for formal events",
-    price: 89.99,
-    imageUrl: "https://images.unsplash.com/photo-1555069519-127aadedf1ee?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmxhemVyfGVufDB8fDB8fHww",
-    category: "Clothing",
-    tags: ["formal", "blazer", "elegant"],
-    inStock: true
-  },
-  {
-    id: "3",
-    name: "Sneakers",
-    description: "Comfortable sneakers for daily use",
-    price: 59.99,
-    imageUrl: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHNuZWFrZXJzfGVufDB8fDB8fHww",
-    category: "Footwear",
-    tags: ["shoes", "sneakers", "comfortable"],
-    inStock: true,
-    discount: 15
-  },
-  {
-    id: "4",
-    name: "Dress Shoes",
-    description: "Classic black dress shoes for formal occasions",
-    price: 79.99,
-    imageUrl: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJlc3MlMjBzaG9lc3xlbnwwfHwwfHx8MA%3D%3D",
-    category: "Footwear",
-    tags: ["shoes", "formal", "dress"],
-    inStock: true
-  },
-  {
-    id: "5",
-    name: "Summer Dress",
-    description: "Light and comfortable dress for summer days",
-    price: 39.99,
-    imageUrl: "https://images.unsplash.com/photo-1612336307429-8a898d10e223?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZHJlc3N8ZW58MHx8MHx8fDA%3D",
-    category: "Clothing",
-    tags: ["dress", "summer", "casual"],
-    inStock: true,
-    discount: 10
-  },
-  {
-    id: "6",
-    name: "Denim Jeans",
-    description: "Classic blue denim jeans, perfect fit",
-    price: 49.99,
-    imageUrl: "https://images.unsplash.com/photo-1602293589930-45aad59ba3ab?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8amVhbnN8ZW58MHx8MHx8fDA%3D",
-    category: "Clothing",
-    tags: ["jeans", "denim", "casual"],
-    inStock: true
-  },
-  {
-    id: "7",
-    name: "Watch",
-    description: "Elegant wristwatch with leather strap",
-    price: 129.99,
-    imageUrl: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d2F0Y2h8ZW58MHx8MHx8fDA%3D",
-    category: "Accessories",
-    tags: ["watch", "accessories", "elegant"],
-    inStock: false
-  },
-  {
-    id: "8",
-    name: "Leather Bag",
-    description: "Handcrafted leather bag for everyday use",
-    price: 149.99,
-    imageUrl: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bGVhdGhlciUyMGJhZ3xlbnwwfHwwfHx8MA%3D%3D",
-    category: "Accessories",
-    tags: ["bag", "leather", "handcrafted"],
-    inStock: true,
-    discount: 20
-  }
-];
+// Use the mock products data from admin-mock-data
+import { mockProducts } from "@/components/admin-mock-data";
 
 const categories = ["All", "Clothing", "Footwear", "Accessories"];
 
 const Products = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
   const [priceRange, setPriceRange] = useState([0, 200]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [discountedOnly, setDiscountedOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Parse query parameters from URL
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const searchParam = queryParams.get("search");
+    const categoryParam = queryParams.get("category");
+    
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+    
+    if (categoryParam && categories.includes(categoryParam)) {
+      setCategory(categoryParam);
+    }
+  }, [location.search]);
+
+  // Update URL when filters change
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
+    
+    if (searchTerm) {
+      queryParams.set("search", searchTerm);
+    }
+    
+    if (category !== "All") {
+      queryParams.set("category", category);
+    }
+    
+    const queryString = queryParams.toString();
+    const newUrl = queryString ? `?${queryString}` : "";
+    
+    navigate(`/products${newUrl}`, { replace: true });
+  }, [searchTerm, category, navigate]);
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,6 +84,14 @@ const Products = () => {
     setPriceRange([0, 200]);
     setInStockOnly(false);
     setDiscountedOnly(false);
+    
+    // Update URL
+    navigate("/products", { replace: true });
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // The URL will be updated via useEffect
   };
 
   return (
@@ -211,23 +172,26 @@ const Products = () => {
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row gap-3 justify-between mb-6">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search products..."
-                  className="pl-9 pr-4"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                {searchTerm && (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
-                    onClick={() => setSearchTerm("")}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
+                <form onSubmit={handleSearch}>
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search products..."
+                    className="pl-9 pr-12"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <Button 
+                      type="button"
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </form>
               </div>
               
               <div className="flex gap-3">

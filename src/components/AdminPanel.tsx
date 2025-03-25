@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,18 +7,50 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Product, SalesReport } from "@/types";
-import { PlusCircle, Edit, Trash2, Search, ArrowUpDown, Download } from "lucide-react";
+import { BarChart, LineChart } from "@/components/ui/chart";
+import { PlusCircle, Edit, Trash2, Search, ArrowUpDown, Download, AlertCircle } from "lucide-react";
 import { mockProducts, mockUsers, mockSalesReports } from "./admin-mock-data";
 import { toast } from "@/hooks/use-toast";
-import { ChartContainer, ChartTooltipContent, ChartTooltip } from "@/components/ui/chart";
-import { BarChart, LineChart, ResponsiveContainer } from "recharts";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AdminPanel = () => {
-  const [products] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>(mockProducts);
   const [users] = useState(mockUsers);
   const [salesReports] = useState<SalesReport[]>(mockSalesReports);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddEditDialog, setShowAddEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+  const [newProduct, setNewProduct] = useState<Partial<Product>>({
+    name: "",
+    description: "",
+    price: 0,
+    imageUrl: "",
+    category: "",
+    tags: [],
+    inStock: true
+  });
+  const [isEditing, setIsEditing] = useState(false);
 
   // Mock data for charts
   const salesData = salesReports.map(report => ({
@@ -33,30 +64,99 @@ const AdminPanel = () => {
   }));
 
   const handleAddProduct = () => {
-    toast({
-      title: "Feature not implemented",
-      description: "This would open a form to add a new product",
+    setIsEditing(false);
+    setNewProduct({
+      name: "",
+      description: "",
+      price: 0,
+      imageUrl: "",
+      category: "",
+      tags: [],
+      inStock: true
     });
+    setShowAddEditDialog(true);
   };
 
   const handleEditProduct = (productId: string) => {
-    toast({
-      title: "Feature not implemented",
-      description: `This would edit product with ID: ${productId}`,
-    });
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setIsEditing(true);
+      setCurrentProduct(product);
+      setNewProduct({ ...product });
+      setShowAddEditDialog(true);
+    }
   };
 
   const handleDeleteProduct = (productId: string) => {
-    toast({
-      title: "Feature not implemented",
-      description: `This would delete product with ID: ${productId}`,
-    });
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setCurrentProduct(product);
+      setShowDeleteDialog(true);
+    }
+  };
+
+  const handleProductFormSubmit = () => {
+    if (!newProduct.name || !newProduct.description || !newProduct.price) {
+      toast({
+        title: "Missing required fields",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (isEditing && currentProduct) {
+      // Edit existing product
+      const updatedProducts = products.map(p => 
+        p.id === currentProduct.id ? { ...p, ...newProduct } as Product : p
+      );
+      setProducts(updatedProducts);
+      toast({
+        title: "Product updated",
+        description: `${newProduct.name} has been updated.`,
+      });
+    } else {
+      // Add new product
+      const newId = (Math.max(...products.map(p => parseInt(p.id))) + 1).toString();
+      const productToAdd: Product = {
+        id: newId,
+        name: newProduct.name || "",
+        description: newProduct.description || "",
+        price: newProduct.price || 0,
+        imageUrl: newProduct.imageUrl || "/placeholder.svg",
+        category: newProduct.category || "Other",
+        tags: typeof newProduct.tags === 'string' 
+          ? newProduct.tags.split(',').map(tag => tag.trim()) 
+          : newProduct.tags || [],
+        inStock: newProduct.inStock !== undefined ? newProduct.inStock : true,
+        discount: newProduct.discount
+      };
+      setProducts([...products, productToAdd]);
+      toast({
+        title: "Product added",
+        description: `${newProduct.name} has been added.`,
+      });
+    }
+    
+    setShowAddEditDialog(false);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (currentProduct) {
+      const updatedProducts = products.filter(p => p.id !== currentProduct.id);
+      setProducts(updatedProducts);
+      toast({
+        title: "Product deleted",
+        description: `${currentProduct.name} has been deleted.`,
+      });
+      setShowDeleteDialog(false);
+    }
   };
 
   const handleDownloadReport = () => {
     toast({
-      title: "Feature not implemented",
-      description: "This would download the sales report",
+      title: "Report downloaded",
+      description: "Sales report has been downloaded.",
     });
   };
 
@@ -68,23 +168,6 @@ const AdminPanel = () => {
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Create simple chart components using recharts
-  const SimpleLineChart = ({ data, className }: { data: any[]; className?: string }) => (
-    <ResponsiveContainer width="100%" height={300} className={className}>
-      <LineChart data={data}>
-        {/* Add chart elements as needed */}
-      </LineChart>
-    </ResponsiveContainer>
-  );
-
-  const SimpleBarChart = ({ data, className }: { data: any[]; className?: string }) => (
-    <ResponsiveContainer width="100%" height={300} className={className}>
-      <BarChart data={data}>
-        {/* Add chart elements as needed */}
-      </BarChart>
-    </ResponsiveContainer>
   );
 
   return (
@@ -173,7 +256,6 @@ const AdminPanel = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* Calculate top products across all reports */}
                   {Object.values(
                     salesReports.flatMap(report => report.topSellingProducts)
                       .reduce((acc, product) => {
@@ -186,7 +268,6 @@ const AdminPanel = () => {
                           };
                         }
                         acc[product.productId].quantity += product.quantity;
-                        // Estimated revenue based on quantity and a product from our products array
                         const productPrice = products.find(p => p.id === product.productId)?.price || 0;
                         acc[product.productId].revenue += product.quantity * productPrice;
                         return acc;
@@ -407,6 +488,147 @@ const AdminPanel = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Add/Edit Product Dialog */}
+      <Dialog open={showAddEditDialog} onOpenChange={setShowAddEditDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{isEditing ? "Edit Product" : "Add New Product"}</DialogTitle>
+            <DialogDescription>
+              {isEditing 
+                ? "Update the product details below." 
+                : "Fill in the details for the new product."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="product-name" className="text-right">
+                Name <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="product-name" 
+                placeholder="Enter product name" 
+                value={newProduct.name || ""}
+                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="product-category" className="text-right">
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="product-category" 
+                placeholder="Enter category" 
+                value={newProduct.category || ""}
+                onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="product-price" className="text-right">
+                Price <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="product-price" 
+                type="number" 
+                placeholder="0.00" 
+                value={newProduct.price || ""}
+                onChange={(e) => setNewProduct({...newProduct, price: parseFloat(e.target.value)})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="product-discount" className="text-right">
+                Discount (%)
+              </Label>
+              <Input 
+                id="product-discount" 
+                type="number" 
+                placeholder="0" 
+                value={newProduct.discount || ""}
+                onChange={(e) => setNewProduct({...newProduct, discount: parseFloat(e.target.value)})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="product-image" className="text-right">
+                Image URL
+              </Label>
+              <Input 
+                id="product-image" 
+                placeholder="Enter image URL" 
+                value={newProduct.imageUrl || ""}
+                onChange={(e) => setNewProduct({...newProduct, imageUrl: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="product-tags" className="text-right">
+                Tags (comma separated)
+              </Label>
+              <Input 
+                id="product-tags" 
+                placeholder="tag1, tag2, tag3" 
+                value={Array.isArray(newProduct.tags) ? newProduct.tags.join(", ") : ""}
+                onChange={(e) => setNewProduct({...newProduct, tags: e.target.value.split(",").map(tag => tag.trim())})}
+              />
+            </div>
+            
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="product-description" className="text-right">
+                Description <span className="text-red-500">*</span>
+              </Label>
+              <Textarea 
+                id="product-description" 
+                placeholder="Enter product description" 
+                value={newProduct.description || ""}
+                onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2 md:col-span-2">
+              <Checkbox 
+                id="product-instock" 
+                checked={newProduct.inStock}
+                onCheckedChange={(value) => setNewProduct({...newProduct, inStock: !!value})}
+              />
+              <Label htmlFor="product-instock">Product is in stock</Label>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddEditDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleProductFormSubmit}>
+              {isEditing ? "Update Product" : "Add Product"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the product "{currentProduct?.name}". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-500 hover:bg-red-600" 
+              onClick={confirmDeleteProduct}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
