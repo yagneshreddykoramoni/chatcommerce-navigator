@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,8 +9,8 @@ import ChatBot from "@/components/ChatBot";
 import { ArrowRight, Search, ShoppingBag, Zap, MessageCircle, ShieldCheck } from "lucide-react";
 import { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
-// Mock products data - same as in Products.tsx
 const mockProducts: Product[] = [
   {
     id: "1",
@@ -59,6 +58,7 @@ const mockProducts: Product[] = [
 
 const Index = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated } = useAuth();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -98,12 +98,14 @@ const Index = () => {
                     <ShoppingBag className="h-5 w-5" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="gap-2">
-                  <Link to="/signin">
-                    Sign In
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
+                {!isAuthenticated && (
+                  <Button asChild variant="outline" size="lg" className="gap-2">
+                    <Link to="/signin">
+                      Sign In
+                      <ArrowRight className="h-5 w-5" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
             

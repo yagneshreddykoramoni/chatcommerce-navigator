@@ -7,6 +7,7 @@ import { ShoppingCart, Heart, Calendar, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { useAppState } from "@/hooks/useAppState";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProductCardProps {
   product: Product;
@@ -17,6 +18,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, className, showActions = true }: ProductCardProps) => {
   const { name, description, price, imageUrl, category, tags, inStock, discount } = product;
   const { addToFavorites, isInFavorites, addToCart } = useAppState();
+  const { isAuthenticated } = useAuth();
   
   const discountedPrice = discount ? price - (price * discount) / 100 : price;
   

@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Product } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 // Define the app state interface
 interface AppState {
@@ -19,6 +20,7 @@ interface AppState {
   bookProduct: (product: Product, date: Date) => void;
   removeBooking: (productId: string) => void;
   clearCart: () => void;
+  requireAuth: (callback: Function, redirectPath?: string) => void;
 }
 
 const AppStateContext = createContext<AppState | undefined>(undefined);
@@ -28,17 +30,36 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<{ product: Product; quantity: number }[]>([]);
   const [bookedItems, setBookedItems] = useState<{ product: Product; date: Date }[]>([]);
   const { toast } = useToast();
+  const { isAuthenticated, setShowAuthDialog, setAuthRedirectPath } = useAuth();
+
+  // Helper function to require authentication before an action
+  const requireAuth = (callback: Function, redirectPath?: string) => {
+    if (isAuthenticated) {
+      callback();
+    } else {
+      if (redirectPath) {
+        setAuthRedirectPath(redirectPath);
+      }
+      setShowAuthDialog(true);
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to continue.",
+      });
+    }
+  };
 
   const addToFavorites = (product: Product) => {
-    if (!isInFavorites(product.id)) {
-      setFavorites([...favorites, product]);
-      toast({
-        title: "Added to favorites",
-        description: `${product.name} has been added to your favorites.`,
-      });
-    } else {
-      removeFromFavorites(product.id);
-    }
+    requireAuth(() => {
+      if (!isInFavorites(product.id)) {
+        setFavorites([...favorites, product]);
+        toast({
+          title: "Added to favorites",
+          description: `${product.name} has been added to your favorites.`,
+        });
+      } else {
+        removeFromFavorites(product.id);
+      }
+    });
   };
 
   const removeFromFavorites = (productId: string) => {
@@ -54,22 +75,24 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addToCart = (product: Product, quantity = 1) => {
-    const existingItemIndex = cartItems.findIndex(
-      (item) => item.product.id === product.id
-    );
+    requireAuth(() => {
+      const existingItemIndex = cartItems.findIndex(
+        (item) => item.product.id === product.id
+      );
 
-    if (existingItemIndex >= 0) {
-      const updatedCartItems = [...cartItems];
-      updatedCartItems[existingItemIndex].quantity += quantity;
-      setCartItems(updatedCartItems);
-    } else {
-      setCartItems([...cartItems, { product, quantity }]);
-    }
+      if (existingItemIndex >= 0) {
+        const updatedCartItems = [...cartItems];
+        updatedCartItems[existingItemIndex].quantity += quantity;
+        setCartItems(updatedCartItems);
+      } else {
+        setCartItems([...cartItems, { product, quantity }]);
+      }
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+      toast({
+        title: "Added to cart",
+        description: `${product.name} has been added to your cart.`,
+      });
+    }, "/cart");
   };
 
   const removeFromCart = (productId: string) => {
@@ -107,11 +130,13 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const bookProduct = (product: Product, date: Date) => {
-    setBookedItems([...bookedItems, { product, date }]);
-    toast({
-      title: "Product booked",
-      description: `${product.name} has been booked for ${date.toLocaleDateString()}.`,
-    });
+    requireAuth(() => {
+      setBookedItems([...bookedItems, { product, date }]);
+      toast({
+        title: "Product booked",
+        description: `${product.name} has been booked for ${date.toLocaleDateString()}.`,
+      });
+    }, `/products/${product.id}`);
   };
   
   const removeBooking = (productId: string) => {
@@ -143,6 +168,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
         bookProduct,
         removeBooking,
         clearCart,
+        requireAuth,
       }}
     >
       {children}
