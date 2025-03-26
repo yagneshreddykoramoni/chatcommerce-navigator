@@ -1,8 +1,7 @@
 
 import { User } from "@/types";
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -11,10 +10,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  showAuthDialog: boolean;
-  setShowAuthDialog: (show: boolean) => void;
-  authRedirectPath: string;
-  setAuthRedirectPath: (path: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,34 +17,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showAuthDialog, setShowAuthDialog] = useState<boolean>(false);
-  const [authRedirectPath, setAuthRedirectPath] = useState<string>("/");
-  const navigate = useNavigate();
-  
-  // Check for saved authentication on mount
-  useEffect(() => {
-    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-    const userRole = localStorage.getItem("userRole");
-    
-    if (isAuthenticated) {
-      // Retrieve user data from localStorage or a token
-      if (userRole === "admin") {
-        setUser({
-          id: "1",
-          name: "Admin User",
-          email: "admin@example.com",
-          isAdmin: true,
-        });
-      } else {
-        setUser({
-          id: "2",
-          name: "Regular User",
-          email: "user@example.com",
-          isAdmin: false,
-        });
-      }
-    }
-  }, []);
 
   // Mock login function - would connect to backend API in real implementation
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -61,44 +28,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Mock user data - in real implementation, this would come from your backend
       if (email === "admin@example.com" && password === "admin123") {
-        const userData = {
+        setUser({
           id: "1",
           name: "Admin User",
           email: "admin@example.com",
           isAdmin: true,
-        };
-        setUser(userData);
+        });
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userRole", "admin");
         toast({
           title: "Welcome back, Admin!",
           description: "You have successfully logged in.",
         });
-        setShowAuthDialog(false);
-        if (authRedirectPath) {
-          navigate(authRedirectPath);
-          setAuthRedirectPath("/");
-        }
         return true;
       } else if (email === "user@example.com" && password === "user123") {
-        const userData = {
+        setUser({
           id: "2",
           name: "Regular User",
           email: "user@example.com",
           isAdmin: false,
-        };
-        setUser(userData);
+        });
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userRole", "user");
         toast({
           title: "Welcome back!",
           description: "You have successfully logged in.",
         });
-        setShowAuthDialog(false);
-        if (authRedirectPath) {
-          navigate(authRedirectPath);
-          setAuthRedirectPath("/");
-        }
         return true;
       } else {
         toast({
@@ -129,24 +84,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mock registration - in real implementation, this would connect to your backend
-      const userData = {
+      setUser({
         id: "3",
         name,
         email,
         isAdmin: false,
-      };
-      setUser(userData);
+      });
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userRole", "user");
       toast({
         title: "Registration successful!",
         description: "Welcome to our shopping assistant.",
       });
-      setShowAuthDialog(false);
-      if (authRedirectPath) {
-        navigate(authRedirectPath);
-        setAuthRedirectPath("/");
-      }
       return true;
     } catch (error) {
       console.error("Registration error:", error);
@@ -169,8 +118,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
-    // Redirect to home page after logout
-    navigate("/");
   };
 
   return (
@@ -182,10 +129,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
-        showAuthDialog,
-        setShowAuthDialog,
-        authRedirectPath,
-        setAuthRedirectPath
       }}
     >
       {children}

@@ -10,7 +10,6 @@ import { ShoppingCart, Heart, Calendar, ChevronLeft, Minus, Plus, Share } from "
 import { mockProducts } from "@/components/admin-mock-data";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/hooks/useAppState";
-import { useAuth } from "@/hooks/useAuth";
 import ChatBot from "@/components/ChatBot";
 import {
   Dialog,
@@ -37,8 +36,6 @@ const ProductDetails = () => {
     getCartItemQuantity,
     bookProduct
   } = useAppState();
-  
-  const { isAuthenticated } = useAuth();
   
   const product = mockProducts.find(p => p.id === productId);
   

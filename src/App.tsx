@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AppStateProvider } from "@/hooks/useAppState";
-import AuthDialog from "@/components/AuthDialog";
 
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
@@ -23,12 +22,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppStateProvider>
-            <Toaster />
-            <Sonner />
-            <AuthDialog />
+      <AuthProvider>
+        <AppStateProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/signin" element={<SignIn />} />
@@ -40,9 +38,9 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </AppStateProvider>
-        </AuthProvider>
-      </BrowserRouter>
+          </BrowserRouter>
+        </AppStateProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
