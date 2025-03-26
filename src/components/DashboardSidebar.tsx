@@ -25,7 +25,7 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
   return (
     <SidebarProvider defaultOpen={true}>
       <Sidebar 
-        className="border-r border-border"
+        className="border-r border-border w-64 min-w-64 max-w-64"
         side="left" 
         variant="sidebar"
         collapsible="icon"
@@ -42,7 +42,7 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
                 tooltip="Overview"
               >
                 <LayoutDashboard className="mr-2" />
-                <span>Overview</span>
+                <span className="truncate">Overview</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -53,7 +53,7 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
                 tooltip="Products"
               >
                 <ShoppingBag className="mr-2" />
-                <span>Products</span>
+                <span className="truncate">Products</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -64,7 +64,7 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
                 tooltip="Customers"
               >
                 <Users className="mr-2" />
-                <span>Customers</span>
+                <span className="truncate">Customers</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -75,7 +75,7 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
                 tooltip="Analytics"
               >
                 <LineChart className="mr-2" />
-                <span>Analytics</span>
+                <span className="truncate">Analytics</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -86,7 +86,7 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
                 tooltip="Settings"
               >
                 <Settings className="mr-2" />
-                <span>Settings</span>
+                <span className="truncate">Settings</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

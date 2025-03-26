@@ -28,9 +28,9 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="flex min-h-[calc(100vh-65px)] mt-16">
+      <div className="flex min-h-[calc(100vh-65px)]">
         <DashboardSidebar activeView={activeView} setActiveView={setActiveView} />
-        <div className="flex-1 p-4 md:p-6 overflow-x-hidden">
+        <div className="flex-1 p-4 md:p-6 overflow-auto">
           <div className="mb-6">
             <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
             <p className="text-muted-foreground">
@@ -38,8 +38,28 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {activeView === "overview" && <SalesOverview salesData={mockSalesReports} />}
-          {activeView === "products" && <AdminPanel />}
+          <div className="w-full">
+            {activeView === "overview" && <SalesOverview salesData={mockSalesReports} />}
+            {activeView === "products" && <AdminPanel />}
+            {activeView === "customers" && (
+              <div className="p-4 border rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">Customer Management</h2>
+                <p className="text-muted-foreground">Customer management features will be available soon.</p>
+              </div>
+            )}
+            {activeView === "analytics" && (
+              <div className="p-4 border rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">Analytics Dashboard</h2>
+                <p className="text-muted-foreground">Advanced analytics features will be available soon.</p>
+              </div>
+            )}
+            {activeView === "settings" && (
+              <div className="p-4 border rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">Dashboard Settings</h2>
+                <p className="text-muted-foreground">Settings options will be available soon.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

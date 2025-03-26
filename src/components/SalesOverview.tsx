@@ -34,9 +34,9 @@ const SalesOverview = ({ salesData }: SalesOverviewProps) => {
     .slice(0, 3);
   
   return (
-    <div className="grid gap-4 md:gap-6">
+    <div className="grid gap-6">
       {/* Summary Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Revenue Overview Card */}
         <Card className="col-span-1">
           <CardHeader className="pb-2">
@@ -81,7 +81,7 @@ const SalesOverview = ({ salesData }: SalesOverviewProps) => {
         </Card>
 
         {/* Top Products Card */}
-        <Card className="col-span-2">
+        <Card className="col-span-1 lg:col-span-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Top Selling Products</CardTitle>
           </CardHeader>
@@ -89,8 +89,10 @@ const SalesOverview = ({ salesData }: SalesOverviewProps) => {
             <ul className="space-y-2">
               {topProducts.map((product, index) => (
                 <li key={index} className="flex justify-between items-center">
-                  <span className="font-medium truncate pr-2">{product.name}</span>
-                  <span className="text-muted-foreground whitespace-nowrap">{product.quantity} units</span>
+                  <span className="font-medium truncate max-w-[150px] md:max-w-[200px]" title={product.name as string}>
+                    {product.name}
+                  </span>
+                  <span className="text-muted-foreground whitespace-nowrap ml-2">{product.quantity} units</span>
                 </li>
               ))}
             </ul>
@@ -109,7 +111,7 @@ const SalesOverview = ({ salesData }: SalesOverviewProps) => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={salesData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
+                margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
