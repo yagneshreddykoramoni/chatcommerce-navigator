@@ -63,6 +63,11 @@ const ProductCard = ({ product, className, showActions = true }: ProductCardProp
             src={imageUrl} 
             alt={name} 
             className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=800&q=80"; // Fallback image
+              target.onerror = null; // Prevent infinite loop
+            }}
           />
         </Link>
         {discount && (

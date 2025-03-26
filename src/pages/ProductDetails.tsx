@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -137,6 +136,11 @@ const ProductDetails = () => {
               src={imageUrl} 
               alt={name} 
               className="object-cover w-full h-full"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=800&q=80"; // Fallback image
+                target.onerror = null; // Prevent infinite loop
+              }}
             />
             {discount && (
               <Badge className="absolute top-4 right-4 bg-primary">

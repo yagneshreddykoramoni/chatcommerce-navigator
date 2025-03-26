@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -56,9 +55,8 @@ const AdminPanel = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Mock data for charts
   const salesData = salesReports.map(report => ({
-    name: report.date.substring(5), // Format as MM-DD
+    name: report.date.substring(5),
     total: report.totalSales
   }));
 
@@ -110,7 +108,6 @@ const AdminPanel = () => {
     }
 
     if (isEditing && currentProduct) {
-      // Edit existing product
       const updatedProducts = products.map(p => 
         p.id === currentProduct.id ? { ...p, ...newProduct } as Product : p
       );
@@ -120,18 +117,23 @@ const AdminPanel = () => {
         description: `${newProduct.name} has been updated.`,
       });
     } else {
-      // Add new product
       const newId = (Math.max(...products.map(p => parseInt(p.id))) + 1).toString();
+      
+      let processedTags: string[] = [];
+      if (typeof newProduct.tags === 'string') {
+        processedTags = newProduct.tags.split(',').map(tag => tag.trim());
+      } else if (Array.isArray(newProduct.tags)) {
+        processedTags = newProduct.tags;
+      }
+      
       const productToAdd: Product = {
         id: newId,
         name: newProduct.name || "",
         description: newProduct.description || "",
         price: newProduct.price || 0,
-        imageUrl: newProduct.imageUrl || "/placeholder.svg",
+        imageUrl: newProduct.imageUrl || "/images/products/placeholder.jpg",
         category: newProduct.category || "Other",
-        tags: typeof newProduct.tags === 'string' 
-          ? newProduct.tags.split(',').map(tag => tag.trim()) 
-          : newProduct.tags || [],
+        tags: processedTags,
         inStock: newProduct.inStock !== undefined ? newProduct.inStock : true,
         discount: newProduct.discount
       };
@@ -184,7 +186,6 @@ const AdminPanel = () => {
           <TabsTrigger value="reports">Sales Reports</TabsTrigger>
         </TabsList>
         
-        {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
@@ -307,7 +308,6 @@ const AdminPanel = () => {
           </Card>
         </TabsContent>
         
-        {/* Products Tab */}
         <TabsContent value="products" className="space-y-4">
           <div className="flex justify-between items-center">
             <div className="relative w-64">
@@ -407,7 +407,6 @@ const AdminPanel = () => {
           </Card>
         </TabsContent>
         
-        {/* Users Tab */}
         <TabsContent value="users" className="space-y-4">
           <div className="relative w-64">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -462,7 +461,6 @@ const AdminPanel = () => {
           </Card>
         </TabsContent>
         
-        {/* Sales Reports Tab */}
         <TabsContent value="reports" className="space-y-4">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg">Sales Reports</CardTitle>
@@ -483,7 +481,7 @@ const AdminPanel = () => {
                   <Legend />
                   <Line type="monotone" dataKey="total" stroke="#0ea5e9" />
                 </LineChart>
-              </ResponsiveContainer>
+              </CardContent>
             </CardContent>
           </Card>
           
@@ -514,7 +512,6 @@ const AdminPanel = () => {
         </TabsContent>
       </Tabs>
       
-      {/* Add/Edit Product Dialog */}
       <Dialog open={showAddEditDialog} onOpenChange={setShowAddEditDialog}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -634,7 +631,6 @@ const AdminPanel = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

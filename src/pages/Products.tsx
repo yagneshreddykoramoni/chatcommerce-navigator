@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import ChatBot from "@/components/ChatBot";
 import { Search, SlidersHorizontal, X } from "lucide-react";
@@ -17,7 +15,8 @@ import { useAppState } from "@/hooks/useAppState";
 // Use the mock products data from admin-mock-data
 import { mockProducts } from "@/components/admin-mock-data";
 
-const categories = ["All", "Clothing", "Footwear", "Accessories"];
+// Updated categories based on our new products
+const categories = ["All", "Clothing", "Footwear", "Electronics", "Accessories", "Fitness", "Home"];
 
 const Products = () => {
   const location = useLocation();
