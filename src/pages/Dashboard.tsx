@@ -30,8 +30,8 @@ const Dashboard = () => {
       <Navbar />
       <div className="flex min-h-[calc(100vh-65px)] mt-16">
         <DashboardSidebar activeView={activeView} setActiveView={setActiveView} />
-        <div className="flex-1 p-6">
-          <div className="mb-8">
+        <div className="flex-1 p-4 md:p-6 overflow-x-hidden">
+          <div className="mb-6">
             <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
             <p className="text-muted-foreground">
               Manage your products, view sales reports, and handle user accounts
