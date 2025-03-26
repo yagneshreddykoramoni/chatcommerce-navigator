@@ -24,25 +24,19 @@ interface DashboardSidebarProps {
 const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) => {
   return (
     <SidebarProvider defaultOpen={true}>
-      <Sidebar 
-        className="border-r border-border w-64 min-w-64 max-w-64"
-        side="left" 
-        variant="sidebar"
-        collapsible="icon"
-      >
-        <SidebarHeader className="pt-4">
+      <Sidebar>
+        <SidebarHeader>
           <h3 className="ml-2 text-lg font-semibold">Admin Controls</h3>
         </SidebarHeader>
-        <SidebarContent className="mt-4">
+        <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 isActive={activeView === "overview"}
                 onClick={() => setActiveView("overview")}
-                tooltip="Overview"
               >
                 <LayoutDashboard className="mr-2" />
-                <span className="truncate">Overview</span>
+                <span>Overview</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -50,10 +44,9 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
               <SidebarMenuButton
                 isActive={activeView === "products"}
                 onClick={() => setActiveView("products")}
-                tooltip="Products"
               >
                 <ShoppingBag className="mr-2" />
-                <span className="truncate">Products</span>
+                <span>Products</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -61,10 +54,9 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
               <SidebarMenuButton
                 isActive={activeView === "customers"}
                 onClick={() => setActiveView("customers")}
-                tooltip="Customers"
               >
                 <Users className="mr-2" />
-                <span className="truncate">Customers</span>
+                <span>Customers</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -72,10 +64,9 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
               <SidebarMenuButton
                 isActive={activeView === "analytics"}
                 onClick={() => setActiveView("analytics")}
-                tooltip="Analytics"
               >
                 <LineChart className="mr-2" />
-                <span className="truncate">Analytics</span>
+                <span>Analytics</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
@@ -83,10 +74,9 @@ const DashboardSidebar = ({ activeView, setActiveView }: DashboardSidebarProps) 
               <SidebarMenuButton
                 isActive={activeView === "settings"}
                 onClick={() => setActiveView("settings")}
-                tooltip="Settings"
               >
                 <Settings className="mr-2" />
-                <span className="truncate">Settings</span>
+                <span>Settings</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

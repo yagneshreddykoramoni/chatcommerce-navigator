@@ -34,102 +34,88 @@ const SalesOverview = ({ salesData }: SalesOverviewProps) => {
     .slice(0, 3);
   
   return (
-    <div className="grid gap-6">
-      {/* Summary Cards */}
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Revenue Overview Card */}
-        <Card className="col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <DollarSign className="w-5 h-5 mr-2 text-muted-foreground" />
-              <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-            </div>
-            <div className="flex items-center mt-2 text-xs">
-              {revenueChange >= 0 ? (
-                <>
-                  <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
-                  <span className="text-green-500">+{revenueChange.toFixed(1)}%</span>
-                </>
-              ) : (
-                <>
-                  <TrendingDown className="w-4 h-4 mr-1 text-red-500" />
-                  <span className="text-red-500">{revenueChange.toFixed(1)}%</span>
-                </>
-              )}
-              <span className="ml-1 text-muted-foreground">from first day</span>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="grid gap-6 grid-cols-1 lg:grid-cols-4">
+      {/* Revenue Overview Card */}
+      <Card className="col-span-1">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center">
+            <DollarSign className="w-5 h-5 mr-2 text-muted-foreground" />
+            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+          </div>
+          <div className="flex items-center mt-2 text-xs">
+            {revenueChange >= 0 ? (
+              <>
+                <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
+                <span className="text-green-500">+{revenueChange.toFixed(1)}%</span>
+              </>
+            ) : (
+              <>
+                <TrendingDown className="w-4 h-4 mr-1 text-red-500" />
+                <span className="text-red-500">{revenueChange.toFixed(1)}%</span>
+              </>
+            )}
+            <span className="ml-1 text-muted-foreground">from first day</span>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Products Sold Card */}
-        <Card className="col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Products Sold</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <ShoppingBag className="w-5 h-5 mr-2 text-muted-foreground" />
-              <div className="text-2xl font-bold">{totalProducts}</div>
-            </div>
-            <div className="mt-2 text-xs text-muted-foreground">
-              Across all product categories
-            </div>
-          </CardContent>
-        </Card>
+      {/* Products Sold Card */}
+      <Card className="col-span-1">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Products Sold</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center">
+            <ShoppingBag className="w-5 h-5 mr-2 text-muted-foreground" />
+            <div className="text-2xl font-bold">{totalProducts}</div>
+          </div>
+          <div className="mt-2 text-xs text-muted-foreground">
+            Across all product categories
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Top Products Card */}
-        <Card className="col-span-1 lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Top Selling Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {topProducts.map((product, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span className="font-medium truncate max-w-[150px] md:max-w-[200px]" title={product.name as string}>
-                    {product.name}
-                  </span>
-                  <span className="text-muted-foreground whitespace-nowrap ml-2">{product.quantity} units</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Top Products Card */}
+      <Card className="col-span-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Top Selling Products</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {topProducts.map((product, index) => (
+              <li key={index} className="flex justify-between items-center">
+                <span className="font-medium">{product.name}</span>
+                <span className="text-muted-foreground">{product.quantity} units</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
       {/* Sales Chart */}
-      <Card className="w-full">
+      <Card className="col-span-1 lg:col-span-4">
         <CardHeader>
           <CardTitle>Sales Overview</CardTitle>
           <CardDescription>Daily sales for the last period</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px] w-full">
+          <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={salesData}
-                margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fontSize: 12 }}
-                  height={40}
-                  tickMargin={8}
-                />
-                <YAxis 
-                  width={50}
-                  tick={{ fontSize: 12 }}
-                />
+                <XAxis dataKey="date" />
+                <YAxis />
                 <Tooltip 
                   formatter={(value) => [`$${value}`, 'Sales']}
                   labelFormatter={(label) => `Date: ${label}`}
-                  contentStyle={{ fontSize: '12px' }}
                 />
-                <Bar dataKey="totalSales" fill="#8884d8" name="Sales" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="totalSales" fill="#8884d8" name="Sales" />
               </BarChart>
             </ResponsiveContainer>
           </div>
