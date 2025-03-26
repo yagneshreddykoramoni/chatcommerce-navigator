@@ -10,6 +10,8 @@ import { ShoppingCart, Heart, Calendar, ChevronLeft, Minus, Plus, Share } from "
 import { mockProducts } from "@/components/admin-mock-data";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/hooks/useAppState";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import ChatBot from "@/components/ChatBot";
 import {
   Dialog,
@@ -37,6 +39,9 @@ const ProductDetails = () => {
     bookProduct
   } = useAppState();
   
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  
   const product = mockProducts.find(p => p.id === productId);
   
   if (!product) {
@@ -63,7 +68,45 @@ const ProductDetails = () => {
   const decreaseQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
   
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to add items to your cart.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
     addToCart(product, quantity);
+  };
+  
+  const handleAddToFavorites = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to add items to your favorites.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
+    addToFavorites(product);
+  };
+  
+  const handleOpenBooking = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to book products.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
+    setIsBookingOpen(true);
   };
   
   const handleBookProduct = () => {
@@ -113,7 +156,7 @@ const ProductDetails = () => {
                   className={cn(
                     isInFavorites(product.id) && "text-red-500"
                   )}
-                  onClick={() => addToFavorites(product)}
+                  onClick={handleAddToFavorites}
                 >
                   <Heart className="h-5 w-5" fill={isInFavorites(product.id) ? "currentColor" : "none"} />
                 </Button>
@@ -202,17 +245,16 @@ const ProductDetails = () => {
               </Button>
               
               <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    className="flex-1 gap-2"
-                    disabled={!inStock}
-                  >
-                    <Calendar className="h-5 w-5" />
-                    Book for Later
-                  </Button>
-                </DialogTrigger>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="flex-1 gap-2"
+                  disabled={!inStock}
+                  onClick={handleOpenBooking}
+                >
+                  <Calendar className="h-5 w-5" />
+                  Book for Later
+                </Button>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Book Product for Purchase</DialogTitle>

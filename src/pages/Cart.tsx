@@ -1,6 +1,5 @@
-
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { 
@@ -21,18 +20,42 @@ import {
 } from "@/components/ui/table";
 import { MinusCircle, PlusCircle, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useAppState } from "@/hooks/useAppState";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const { cartItems, updateCartQuantity, removeFromCart, getCartTotal, clearCart } = useAppState();
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to view your cart.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+    }
+  }, [isAuthenticated, navigate, toast]);
   
   const handleUpdateQuantity = (productId: string, quantity: number) => {
     updateCartQuantity(productId, quantity);
   };
   
   const handleCheckout = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to checkout.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
     setIsProcessing(true);
     
     // Simulate checkout process
@@ -45,6 +68,10 @@ const Cart = () => {
       setIsProcessing(false);
     }, 1500);
   };
+  
+  if (!isAuthenticated) {
+    return null;
+  }
   
   return (
     <div className="min-h-screen bg-background">

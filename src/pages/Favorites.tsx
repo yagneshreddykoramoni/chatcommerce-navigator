@@ -1,13 +1,34 @@
 
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import { Heart } from "lucide-react";
 import { useAppState } from "@/hooks/useAppState";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const Favorites = () => {
   const { favorites } = useAppState();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to view your favorites.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+    }
+  }, [isAuthenticated, navigate, toast]);
+  
+  if (!isAuthenticated) {
+    return null;
+  }
   
   return (
     <div className="min-h-screen bg-background">

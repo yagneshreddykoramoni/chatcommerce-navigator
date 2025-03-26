@@ -3,10 +3,12 @@ import { Product } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Heart, Calendar, ExternalLink } from "lucide-react";
+import { ShoppingCart, Heart, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppState } from "@/hooks/useAppState";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -17,8 +19,41 @@ interface ProductCardProps {
 const ProductCard = ({ product, className, showActions = true }: ProductCardProps) => {
   const { name, description, price, imageUrl, category, tags, inStock, discount } = product;
   const { addToFavorites, isInFavorites, addToCart } = useAppState();
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   
   const discountedPrice = discount ? price - (price * discount) / 100 : price;
+  
+  const handleAddToFavorites = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation to product details
+    
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to add items to your favorites.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
+    addToFavorites(product);
+  };
+  
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to add items to your cart.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
+    addToCart(product);
+  };
   
   return (
     <Card className={cn("overflow-hidden group hover-scale", className)}>
@@ -43,7 +78,7 @@ const ProductCard = ({ product, className, showActions = true }: ProductCardProp
               "absolute top-2 left-2 text-white bg-black/30 hover:bg-black/50",
               isInFavorites(product.id) && "text-red-500 bg-white/80 hover:bg-white/90"
             )}
-            onClick={() => addToFavorites(product)}
+            onClick={handleAddToFavorites}
           >
             <Heart className="h-4 w-4" fill={isInFavorites(product.id) ? "currentColor" : "none"} />
           </Button>
@@ -95,7 +130,7 @@ const ProductCard = ({ product, className, showActions = true }: ProductCardProp
         <CardFooter className="pt-0 flex gap-2">
           <Button 
             className="flex-1" 
-            onClick={() => addToCart(product)} 
+            onClick={handleAddToCart} 
             disabled={!inStock}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />

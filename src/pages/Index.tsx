@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,8 +9,8 @@ import ChatBot from "@/components/ChatBot";
 import { ArrowRight, Search, ShoppingBag, Zap, MessageCircle, ShieldCheck } from "lucide-react";
 import { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
-// Mock products data - same as in Products.tsx
 const mockProducts: Product[] = [
   {
     id: "1",
@@ -59,6 +58,7 @@ const mockProducts: Product[] = [
 
 const Index = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated } = useAuth();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -98,12 +98,14 @@ const Index = () => {
                     <ShoppingBag className="h-5 w-5" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="gap-2">
-                  <Link to="/signin">
-                    Sign In
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </Button>
+                {!isAuthenticated && (
+                  <Button asChild variant="outline" size="lg" className="gap-2">
+                    <Link to="/signin">
+                      Sign In
+                      <ArrowRight className="h-5 w-5" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
             
@@ -234,12 +236,14 @@ const Index = () => {
           <p className="max-w-xl mx-auto mb-8 opacity-90">
             Create an account today and start enjoying personalized recommendations, exclusive deals, and real-time assistance.
           </p>
-          <Button asChild size="lg" variant="secondary" className="gap-2">
-            <Link to="/signin">
-              Get Started
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </Button>
+          {!isAuthenticated && (
+            <Button asChild size="lg" variant="secondary" className="gap-2">
+              <Link to="/signin">
+                Get Started
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
         </div>
       </section>
       
@@ -259,7 +263,9 @@ const Index = () => {
               <ul className="space-y-2">
                 <li><Link to="/" className="text-muted-foreground hover:text-foreground">Home</Link></li>
                 <li><Link to="/products" className="text-muted-foreground hover:text-foreground">Products</Link></li>
-                <li><Link to="/signin" className="text-muted-foreground hover:text-foreground">Sign In</Link></li>
+                {!isAuthenticated && (
+                  <li><Link to="/signin" className="text-muted-foreground hover:text-foreground">Sign In</Link></li>
+                )}
               </ul>
             </div>
             
